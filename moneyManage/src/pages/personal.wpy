@@ -1,0 +1,111 @@
+<style type="less">
+	@import '../common/less/variable.less';
+
+	@height-header-per: 150rpx;
+	@height-navigator: 30rpx;
+	@margin-top-nav: 20rpx;
+
+	.personal {
+		width: 100%;
+		height: 100%;
+		background-color: rgba(242, 242, 242, 0.427450980392157);
+		.header-per {
+			width: 100%;
+			height: @height-header-per;
+			background-color: #fff;
+			view {
+				float: left;
+			}
+			.img {
+				width: 30%;
+				height: 100%;
+				.headImg {
+					width: 120rpx;
+					height: 120rpx;
+					border: 1px solid rgba(121, 121, 121, 1);
+					border-radius: 50%;
+					margin: 15rpx 48rpx;
+				}
+			}
+			.name {
+				width: 70%;
+				height: 100%;
+				/*background-color: yellow;*/
+			}
+		}
+		.nav {
+			width: 100%;
+			height: auto;
+			overflow: hidden;
+			margin-top: @margin-top-nav;
+			color: @color-text-main;
+			navigator {
+				width: 100%;
+				height: @height-navigator;
+				padding: 20rpx;
+				background-color: #fff;
+				line-height: @height-navigator;
+				font-size: @font-size-main;
+				margin-top: @margin-top-nav / 2;
+			}
+		}
+	}
+</style>
+
+<template>
+	<view class="personal">
+		<!-- 头像 -->
+		<view class="header-per">
+			<view class="img">
+				<view class="headImg">
+					<image style="width:120rpx;height:120rpx;margin:0rpx;border-radius: 50%;" src="{{wxHeadImg}}"/>
+				</view>
+			</view>
+			<view class="name">
+				<text class="nameWx">{{wxName}}</text>
+			</view>
+		</view>
+
+		<!-- 导航区域 -->
+		<view class="nav">
+			<navigator url="/pages/chart" open-type="navigate">图标类型</navigator>
+			<navigator url="/pages/billType" open-type="navigate">类型管理</navigator>
+			<navigator url="/pages/index" open-type="navigate">用户反馈</navigator>
+			<navigator url="/pages/home" open-type="navigate">关于我们</navigator>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy'
+	import tips from '@/utils/loading'
+
+	export default class Personal extends wepy.page {
+		config = {
+			navigationBarTitleText: '个人',
+			navigationBarBackgroundColor: '#EB5056',
+			navigationBarTextStyle: 'white'
+		}
+
+		data = {
+			wxHeadImg: '',
+			wxName: ''
+		}
+
+		onLoad() {
+			// 数据等待框
+			tips.loading()
+
+			let self = this
+			this.$parent.getUserInfo((userInfo) => {
+				console.log(userInfo)
+				// 取消等待框
+				tips.loaded()
+
+				self.wxHeadImg = userInfo.avatarUrl
+				self.wxName = userInfo.nickName
+				self.$apply()
+			})
+		}
+	}
+</script>

@@ -1,0 +1,158 @@
+<style type="less">
+	@height-title: 60rpx;
+
+	.chart{
+		.canvas {
+		    width: 100%;
+		    height: 50%;
+		}
+		.title {
+			width: 100%;
+			height: @height-title;
+			line-height: @height-title;
+			text-align: center;
+		}
+	}
+</style>
+
+<template>
+	<view class="chart">
+		<picker mode="date" value="{{date}}" start="2015-09-01" end="2017-09-01" fields="month" bindchange="bindDateChange">
+			<view class="title">{{now}}&#9660;</view>
+		</picker>
+		<canvas canvas-id="pieCanvas" class="canvas" style="height:300px" bindtouchstart="touchHandler"></canvas>
+		<canvas canvas-id="lineCanvas" class="canvas" style="height:300px" bindtouchstart="touchHandler"></canvas>
+	</view>
+</template>	
+
+<script>
+	import wepy from 'wepy'
+	import Charts from '@/utils/wxcharts'
+	import request from '@/api'
+	import { monthType } from '@/api/urlName'
+	import Index from '@/mixins'
+
+	export default class Chart extends wepy.page {
+		config = {
+
+		}
+
+		data = {
+			pieData: [],
+			lineData: []
+		}
+
+		createSimulationData() {
+      var categories = []
+      var data = []
+      for (var i = 0; i < 10; i++) {
+          categories.push('2016-' + (i + 1))
+          data.push(Math.random() * (20 - 10) + 10)
+      }
+      return {
+          categories: categories,
+          data: data
+      }
+    }
+
+    /*
+     ** 绘制环形图
+    */
+    pie(windowWidth) {
+    const pie = new Charts({
+          animation: true,
+          canvasId: 'pieCanvas',
+          type: 'ring',
+          extra: {
+              ringWidth: 35,
+              pie: {
+                  offsetAngle: -35
+              }
+          },
+          title: {
+              name: '32',
+              color: '#7cb5ec',
+              fontSize: 25
+          },
+          subtitle: {
+              name: '月消费',
+              color: '#666666',
+              fontSize: 15
+          },
+          series: this.pieData,
+          width: windowWidth,
+          height: 300,
+          dataLabel: true
+      })
+			console.log(pie)
+    }
+
+    /*
+     **绘制折现图
+    */
+    line(windowWidth) {
+    let simulationData = this.createSimulationData()
+      let lineChart = new Charts({
+            canvasId: 'lineCanvas',
+            type: 'line',
+            categories: simulationData.categories,
+            animation: true,
+            // background: '#f5f5f5',
+            series: [{
+                name: '月消费趋势',
+                data: simulationData.data,
+                format: function (val, name) {
+                    return val.toFixed(2) + '万'
+                }
+            }, {
+                name: '成交量2',
+                data: [2, 0, 0, 3, null, 4, 0, 0, 2, 0],
+                format: function (val, name) {
+                    return val.toFixed(2) + '万'
+                }
+            }],
+            xAxis: {
+                disableGrid: true
+            },
+            yAxis: {
+                title: '成交金额 (万元)',
+                format: function (val) {
+                    return val.toFixed(2)
+                },
+                min: 0
+            },
+            width: windowWidth,
+            height: 200,
+            dataLabel: false,
+            dataPointShape: true,
+            extra: {
+                lineStyle: 'curve'
+            }
+        })
+			console.log(lineChart)
+    }
+
+    mixins = [Index]
+
+		async onLoad() {
+			// 检测设置屏幕宽度
+			var windowWidth = 320
+      try {
+          var res = wepy.getSystemInfoSync()
+          windowWidth = res.windowWidth
+      } catch (e) {
+          console.error('getSystemInfoSync failed!')
+      }
+      let { data } = await request(monthType)
+      this.pieData = data
+
+      this.$apply()
+
+      console.log('mixin')
+      console.log(this.now)
+
+      this.pie(windowWidth)
+			this.line(windowWidth)
+		}
+	}
+</script>

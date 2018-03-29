@@ -1,0 +1,248 @@
+<style type="less">
+	@import '../common/less/variable.less';
+
+	@header-height: 50px;
+	@color-header: #fff;
+	@height-show: 20px;
+	@height-content: 50px;
+
+	.header {
+		width: 100%;
+		height: @header-height;
+		background-color: @main-background;
+		.header-top {
+			width: 100%;
+			height: @header-height;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: @color-header;
+			line-height: @header-height/2;
+			view {
+				flex: 2;
+				font-size: @main-font-size;
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				&.one {
+					flex: 1;
+					&:after {
+						content: '';
+						position: absolute;
+						left: 48px;
+						top: 8px;
+						height: 36px;
+						width: 1px;
+						border-right: 1px dashed #6b6b6b;
+					}
+				}
+				text {
+					height: @header-height/2;
+					flex: 1;
+				}
+			}
+		}
+	}
+	.detail {
+		width: 100%;
+		height: auto;
+		font-size: @font-size-payOut;
+		.every {
+			.top {
+				padding: 0 10px;
+				background-color: @color-background-payOut;
+				.show {
+					display: flex;
+					flex-direction: row;
+					color: @color-text-main;
+					text {
+						height: @height-show;
+						line-height:  @height-show;
+						flex: 1;
+						&.day {
+							flex: 3;
+						}
+						&.payOut {
+							flex: 2;
+						}
+					}
+				}
+			}
+			.content {
+				.dayDetail {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					height: 	@height-content;
+					border-bottom: 1px solid @color-border-payout;
+					margin: 0 10px;
+					color: @color-text-main;
+					image {
+						height: @height-content - 20;
+						flex: 2;
+					}
+					text {
+						flex: 4;
+						font-size: @main-font-size+1;
+						&.num {
+							flex: 2;
+						}
+					}
+				}
+			}
+		}
+	}
+</style>
+
+<template>
+	<!-- 头部资产信息展示 -->
+	<view class="header" data-date="{{now}}">
+		<view class="header-top">
+			<picker mode="date" value="{{date}}" start="2015-09-01" end="2017-09-01" fields="month" bindchange="bindDateChange">
+				<view class="one">
+					<text>{{now.year}}年</text>
+					<text>{{now.month}}月</text>
+				</view>
+			</picker>
+			<view>
+				<text>总资产(元)</text>
+				<text>{{monthData.totalCredit}}</text>
+			</view>
+			<view>
+				<text>收入</text>
+				<text>{{monthData.income}}</text>
+			</view>
+			<view>
+				<text>支出</text>
+				<text>{{monthData.outgoing}}</text>
+			</view>
+		</view>
+	</view>
+
+	<!-- 中间资产信息笔笔详情 -->
+	<Daycontent :dayData.sync="dayData" :bb.sync="bb"></Daycontent>
+</template>
+
+<script>
+	import wepy from 'wepy'
+	import tips from '@/utils/loading'
+	import { monthSummarizeUrl, everyDayUrl } from '@/api/urlName'
+	import request from '@/api'
+	import { dealTime, dealNowDate } from '@/utils'
+	import Daycontent from '@/components/dayContent'
+
+	export default class Bill extends wepy.page {
+		config = {
+			navigationBarTitleText: 'Smart记账',
+			navigationBarBackgroundColor: '#EB5056',
+			navigationBarTextStyle: 'white',
+			enablePullDownRefresh: true,
+			backgroundTextStyle: 'dark',
+			onReachBottomDistance: 10
+		}
+
+		components = {
+			Daycontent: Daycontent
+		}
+
+		data = {
+			monthData: {},
+			dayData: [],
+			bb: {},
+			now: {}
+		}
+
+		methods = {
+			onReachBottom() {
+				this.getDay()
+			},
+			bindDateChange(e) {
+				let chooseDate = e.detail.value
+				let dateArray = chooseDate.split('-')
+				this.now = {
+					year: dateArray[0],
+					month: dateArray[1]
+				}
+
+				this.$apply()
+			}
+		}
+
+		// computed = {
+		// 	now() {
+		// 		let time = new Date().getTime()
+		// 		return dealNowDate(time)
+		// 	}
+		// }
+
+		watch = {
+			now(pre) {
+				/*
+				 **监听时间的选择 展示相应的数据
+				*/
+
+				/*
+				 *传如对应的请求参数
+				*/
+				this.getMonth()
+				/*
+				 *下拉加载需要拼接数据，此处需要重置
+				*/
+				this.dayData = []
+				this.getDay()
+			}
+		}
+		/*
+			*???*当前时间如何确定
+		*/
+		/*
+			*获取整月的合计
+		*/
+		getMonth() {
+			let self = this
+			request(monthSummarizeUrl, {time: '123423423'}).then((res) => {
+				self.monthData = res.data
+				self.$apply()
+			}, (err) => {
+				console.log(err)
+			})
+		}
+
+		/*
+			*获取每天的消费情况
+		*/
+		async getDay() {
+			tips.loading()
+			let { days } = await request(everyDayUrl)
+			this.dayData = this.dayData.concat(dealTime(days))
+			this.$apply()
+			this.loaded()
+		}
+
+		loaded() {
+			setTimeout(() => {
+				tips.loaded()
+			}, 1000)
+		}
+
+		async onLoad() {
+			this.bb = {
+				a: 10,
+				b: 20
+			}
+			/*
+				*获取整月的合计
+			*/
+			await this.getMonth()
+			await this.getDay()
+
+			/*
+			 ** 获取当前时间
+			*/
+			let time = new Date().getTime()
+			this.now = dealNowDate(time)
+			this.$apply()
+		}
+	}
+
+</script>

@@ -1,0 +1,114 @@
+<style type="less">
+	@import '../common/less/variable.less';
+
+	@height-header: 30px;
+	@height-header-view: 20px;
+
+	.addBill {
+		.content {
+			width: 100%;
+			height: auto;
+			padding: 3%;
+		}
+	}
+</style>
+
+<template>
+	<view class="addBill">
+		<tabInOut />
+		<text>{{type}}</text>
+		<view class="content">
+			<billContent :dataObj.sync="detailData" />
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy'
+	import tips from '@/utils/loading'
+	import request from '@/api'
+	import { everyDayUrl } from '@/api/urlName'
+	import { dealTime, dealNowDate } from '@/utils'
+
+	import BillContent from '@/components/bill-content'
+	import TabInOut from '@/components/tab-in-out'
+	export default class AddBill extends wepy.page {
+		config = {
+			navigationBarTitleText: '新建',
+			navigationBarBackgroundColor: '#EB5056',
+			navigationBarTextStyle: 'white'
+		}
+
+		components = {
+			billContent: BillContent,
+			tabInOut: TabInOut
+		}
+
+		data = {
+			type: '',
+			detailData: {
+				id: -1,
+				time: '3月23日',
+				type: 0,
+				account: '$0.0'
+			}
+		}
+
+		methods = {
+			setOrigin(...args) {
+				console.log('...args')
+			}
+		}
+
+		events = {
+			'isIncome': (type) => {
+				this.type = type
+			}
+		}
+
+		bindDateChange() {
+			console.log(88)
+		}
+
+		_loaded() {
+			setTimeout(() => {
+				tips.loaded()
+			}, 200)
+		}
+
+		/*
+			**详情的获取
+		*/
+		async getDetail(id) {
+			let { days } = await request(everyDayUrl, {'id': id})
+			let data = dealTime(days)[0]
+			let obj = {
+				time: data.time,
+				id: data.accounts[0].id,
+				type: data.accounts[0].type,
+				account: data.accounts[0].account
+			}
+			this.detailData = obj
+			console.log('this.detailData')
+			console.log(this.detailData)
+			this.$apply()
+		}
+
+		onLoad(option) {
+			this.aa = 888
+			let id = option.id
+				if (id) {
+					/*
+					 ** 详情进来的
+					*/
+					this.getDetail(id)
+				} else {
+					let { month, day } = dealNowDate(new Date().getTime())
+					this.detailData.time = `${month}月-${day}日`
+				}
+			this.$apply()
+			tips.loading()
+			this._loaded()
+		}
+	}
+</script>

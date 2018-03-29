@@ -1,0 +1,63 @@
+<style lang="less">
+
+</style>
+
+<template>
+	<view class="detail">
+		<view class="every" wx:for="{{dayData}}" wx:key="{{index}}">
+			<view class="top">
+				<view class="show">
+					<text class="1">{{item.time}}</text>
+					<text class="day">{{item.week}}</text>
+					<text class="payOut">支出：{{item.surplus}}</text>
+				</view>	
+			</view>
+			<!-- 此处Id肿么搞 -->
+			<view class="content" wx:for="{{item.accounts}}" wx:key="{{index}}" wx:for-item="dayItem" @tap="change" data-id="{{dayItem.id}}">
+				<view class="dayDetail">
+					<image src="../../common/images/餐饮 64.png"
+						mode="aspectFit"
+					></image>
+					<text class="type">{{dayItem.type}}</text>
+					<text class="num">{{dayItem.account}}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy'
+	export default class Daycontent extends wepy.component {
+		props = {
+			dayData: Array,
+			bb: Number
+		}
+
+		methods = {
+			change(event) {
+				console.log(this.dayData)
+				// return
+				// 获取该笔详情的ID
+				let id = event.currentTarget.dataset.id
+				wepy.reLaunch({
+					url: `addBill?id=${id}`
+				})
+			}
+		}
+
+		watch = {
+			// dayData(now) {
+			// 	if (!now.id) {
+			// 		console.log('aaa')
+			// 	} else {
+			// 		console.log('bbbb')
+			// 	}
+			// }
+		}
+
+		onLoad() {
+			console.log(this.dayData)
+		}
+	}
+</script>

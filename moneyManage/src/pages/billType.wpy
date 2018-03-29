@@ -1,0 +1,140 @@
+<style lang="less">
+	@import '../common/less/variable.less';
+
+	@height-billType: 120rpx;
+	@height-fotterBill: 100rpx;
+	.billType {
+		.btContenr {
+			width: 120%;
+			height: @height-billType;
+			border-bottom: 1px solid rgba(188, 188, 188, 1);
+			line-height: @height-billType - 15;
+			transition: all 300ms ease 0s;
+			&.delShow {
+				transform: translateX(-150rpx);
+			}
+			&.delHide {
+				transform: translateX(0rpx);
+			}
+			.imgOuter {
+				width: 60rpx;
+				height: 60rpx;
+				border: 1px solid rgba(188, 188, 188, 1);
+				border-radius: 50%;
+				display: inline-block;
+				vertical-align: middle;
+				margin: 0 50rpx;
+				image {
+					width: 40rpx;
+					height: 40rpx;
+					border-radius: 100%;
+					margin: 10rpx;
+					display: block;
+				}
+			}
+			text {
+				display: inline-block;
+				vertical-align: middle;
+				font-size: @font-size-main;
+				color: @color-text-main;
+			}
+			.delete {
+				width: 120rpx;
+				height: 100%;
+				background-color: red;
+				color: #fff;
+				display: inline-block;
+				vertical-align: middle;
+				float: right;
+				text-align: center;
+				font-size: @font-size-main;
+			}
+		}
+		.fotter-bill {
+			width: 100%;
+			height:	@height-fotterBill;
+			text-align: center;
+			line-height: @height-fotterBill;
+			position: fixed;
+			bottom: 0;
+			font-size: @font-size-main;
+			color: @color-addBill-cur;
+			border-top: 1px solid rgba(121, 121, 121, 1);
+		}
+	}
+</style>
+
+<template>
+	<view class="billType">
+		<!-- 头像信息引入 -->
+		<tabInOut />
+		<view class="btContenr {{isTrans?'delShow':''}}" @touchstart="_touchstart" @touchend="_touchend">
+			<view class="imgOuter">
+				<image src="../common/images/投资 64.png" /> 
+			</view>
+			<text>薪资</text>
+			<view class="delete">
+				删除
+			</view>
+		</view>	
+		<view class="fotter-bill">
+			+添加类别
+		</view>	
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy'
+
+	import TabInOut from '@/components/tab-in-out'
+
+	// 删除按钮的宽度
+	const widDelete = 120 / 2
+
+	export default class Billtype extends wepy.page {
+		config = {
+			navigationBarTitleText: '类别管理',
+			navigationBarBackgroundColor: '#EB5056'
+		}
+
+		components = {
+			tabInOut: TabInOut
+		}
+
+		data = {
+			moveDisStart: 0,
+			moveDis: 0,
+			isTrans: false
+		}
+
+		methods = {
+			_touchstart(el) {
+				this.moveDisStart = el.touches[0].pageX
+			},
+			_touchend(el) {
+				console.log(el)
+				this.moveDis = this.moveDisStart - el.changedTouches[0].pageX
+			}
+		}
+
+		watch = {
+			moveDis(val) {
+				console.log(val)
+				switch (true) {
+					case (val > 0):
+						if (val > widDelete) this.isTrans = true
+						break
+					case val < 0:
+						this.isTrans = false
+						break
+					default:
+						break
+				}
+			}
+		}
+
+		onLoad() {
+
+		}
+	}
+</script>

@@ -1,0 +1,74 @@
+<style lang="less">
+	@import '../common/less/variable.less';
+
+	@height-header: 50px;
+	@height-header-view: 20px;
+
+	.tabInOut {
+		.header {
+			width: 100%;
+			height: @height-header;
+			background: @main-background;
+			color: #fff;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			view {
+				width: 30%;
+				height: @height-header-view;
+				border: 1px solid #fff;
+				border-radius: @border-radius-main;
+				text-align: center;
+				font-size: @font-size-main;
+				line-height: @height-header-view;
+				&.current {
+					background-color: #fff;
+					color: @color-addBill-cur;
+				}
+			}
+		}
+	}
+</style>
+
+<template>
+	<view class="tabInOut">
+		<view class="header">
+			<view class="{{currentClassLeft}}" id="left" @tap="_taggleClassLeft">收入</view>
+			<view class="{{currentClassRight}}" id="right" @tap="_taggleClassRight">支出</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import wepy from 'wepy'
+
+	export default class TabInOut extends wepy.component {
+		data = {
+			currentClassLeft: 'current',
+			currentClassRight: ''
+		}
+
+		methods = {
+			_taggleClassLeft(evt) {
+				this.currentClassLeft = 'current'
+				this.currentClassRight = ''
+				/*
+					* 告知父组件,点击的类型
+					* 收入
+				*/
+				this.$emit('isIncome', 'inCome')
+			},
+			_taggleClassRight(evt) {
+				this.currentClassLeft = ''
+				this.currentClassRight = 'current'
+
+				/*
+					* 告知父组件,点击的类型
+					* 支出
+				*/
+				this.$emit('isIncome', 'expense')
+			}
+		}
+	}
+</script>
