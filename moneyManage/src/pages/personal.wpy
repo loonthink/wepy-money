@@ -68,7 +68,7 @@
 
 		<!-- 导航区域 -->
 		<view class="nav">
-			<navigator url="/pages/chart" open-type="navigate">图标类型</navigator>
+			<navigator url="/pages/chart" open-type="navigate">图表分析</navigator>
 			<navigator url="/pages/billType" open-type="navigate">类型管理</navigator>
 			<navigator url="/pages/index" open-type="navigate">用户反馈</navigator>
 			<navigator url="/pages/home" open-type="navigate">关于我们</navigator>

@@ -34,7 +34,8 @@
 
 	export default class Chart extends wepy.page {
 		config = {
-
+      navigationBarTitleText: '统计',
+      navigationBarBackgroundColor: '#EB5056'
 		}
 
 		data = {

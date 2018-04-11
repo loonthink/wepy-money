@@ -37,21 +37,22 @@ export default class extends wepy.app {
     },
     tabBar: {
       'color': '#6B6B6B',
+      'selectedColor': '#ef5252',
       'list': [{
         'text': '账单',
         'pagePath': 'pages/home',
-        'iconPath': './common/images/投资 64.png',
-        'selectedIconPath': './common/images/投资 64.png'
+        'iconPath': './common/images/billPre.png',
+        'selectedIconPath': './common/images/billCur.png'
       }, {
         'text': '新增',
         'pagePath': 'pages/addBill',
-        'iconPath': './common/images/通讯64 .png',
-        'selectedIconPath': './common/images/通讯64 .png'
+        'iconPath': './common/images/addPre.png',
+        'selectedIconPath': './common/images/addCur.png'
       }, {
         'text': '个人',
         'pagePath': 'pages/personal',
-        'iconPath': './common/images/薪资 64.png',
-        'selectedIconPath': './common/images/薪资 64.png'
+        'iconPath': './common/images/personPre.png',
+        'selectedIconPath': './common/images/personCur.png'
       }]
     }
   }
